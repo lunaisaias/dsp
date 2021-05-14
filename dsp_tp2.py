@@ -80,3 +80,25 @@ def hann(M):
     hann = 0.5 - 0.5*np.cos((2*np.pi*n)/(M-1))
     
     return hann
+
+def interpolacionCuadratica(x):
+    """
+    Funcion que realiza interpolación cuadrática para encontrar una
+    mejor aproximación del índice de un máximo
+
+    Parameters
+    ----------
+    x : Señal de entrada
+
+    Returns
+    -------
+    Devuelve valor de índice maximo interpolado
+
+    """
+    indiceMaximo = x.index(np.max(x))
+    beta = abs(x[indiceMaximo])
+    alfa = abs(x[indiceMaximo-1])
+    gama = abs(x[indiceMaximo+1])
+    maximo= indiceMaximo + ((alfa-gama)/(2*(alfa-2*beta+gama)))
+    
+    return maximo
