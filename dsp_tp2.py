@@ -81,7 +81,7 @@ def hann(M):
     
     return hann
 
-def interpolacionCuadratica(x):
+def int_cuadratica(x):
     """
     Funcion que realiza interpolación cuadrática para encontrar una
     mejor aproximación del índice de un máximo
@@ -95,10 +95,19 @@ def interpolacionCuadratica(x):
     Devuelve valor de índice maximo interpolado
 
     """
-    indiceMaximo = x.index(np.max(x))
-    beta = abs(x[indiceMaximo])
-    alfa = abs(x[indiceMaximo-1])
-    gama = abs(x[indiceMaximo+1])
-    maximo= indiceMaximo + ((alfa-gama)/(2*(alfa-2*beta+gama)))
+    indice_maximo = max(x)
+
+    muestras =[]
+   
+    for i in range (0, len(x)-1):
+        if x[i]== indice_maximo:
+            muestras.append([i])
+            
+        beta = x[i]
+        alfa = x[i-1]
+        gama = x[i+1]
+        
+    #asumo uno porque funciones simétricas y periódicas 
+    maximo = indice_maximo + ((alfa-gama)/(2*(alfa-2*beta+gama)))
     
-    return maximo
+    return muestras, maximo
