@@ -96,18 +96,75 @@ def int_cuadratica(x):
 
     """
     indice_maximo = max(x)
-
-    muestras =[]
-   
-    for i in range (0, len(x)-1):
-        if x[i]== indice_maximo:
-            muestras.append([i])
-            
-        beta = x[i]
-        alfa = x[i-1]
-        gama = x[i+1]
-        
-    #asumo uno porque funciones simétricas y periódicas 
-    maximo = indice_maximo + ((alfa-gama)/(2*(alfa-2*beta+gama)))
+    freq_max = np.where(x == indice_maximo)
+    freq_max= int(freq_max[0][0])
     
-    return muestras, maximo
+    beta = abs(x[freq_max])
+    alfa = abs(x[freq_max-1])
+    gamma = abs(x[freq_max+1])
+    
+    
+    maximo = indice_maximo + ((alfa-gamma)/(2*(alfa-2*beta+gamma)))
+    
+    freq = np.where(x == maximo)
+    freq = freq[0][0]
+    
+   
+    return freq, maximo
+
+def derivada_finita(x, fs = 44100):
+
+    df = []
+
+    for i in range (0, len(x)-1):
+        der = ( x[i+1] - x[i] ) / ( 1/fs )
+        df.append(der)
+        
+  
+    return df
+    
+     
+
+def convolucion_DFT(signal1,signal2):
+    
+    '''
+    Scipy implementation of a moving average filter with a convolutional method.
+    The resulting filtered sample is calculated with a convolution between the
+    original signal and a rectangular pulse with length 'M'.
+
+    Parameters
+    ----------
+    signal1 : ndarray
+        Input signal.
+    
+    signal2 : ndarray
+        Input signal.
+        
+
+    Returns
+    -------
+    y : ndarray
+        Output convolution.
+
+    '''
+    x = np.copy(signal1)
+    h = np.copy(signal2)
+    
+    N = len(x) + len(h) - 1        
+    
+    zeros_1 = np.zeros(N - len(x))
+    x = np.hstack((x, zeros_1))
+    
+    
+    zeros_2 = np.zeros(N - len(h))
+    h = np.hstack((h, zeros_2))
+
+    x_DFT = np.fft.fft(x)
+    h_DFT = np.fft.fft(h)
+    
+    y_DFT = x_DFT * h_DFT
+    
+    y = np.fft.ifft(y_DFT)
+    
+    return abs(y),h
+
