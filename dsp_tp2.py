@@ -106,11 +106,14 @@ def int_cuadratica(x):
     
     maximo = indice_maximo + ((alfa-gamma)/(2*(alfa-2*beta+gamma)))
     
-    freq = np.where(x == maximo)
-    freq = freq[0][0]
+    posicion_maxima =  ((alfa-gamma)/(2*(alfa-2*beta+gamma)))
+    
+    frecuencia_de_interpolacion = freq_max + posicion_maxima
+
+    amplitud_maxima = beta- ((1/4)*(alfa - gamma)*posicion_maxima)
     
    
-    return freq, maximo
+    return amplitud_maxima, frecuencia_de_interpolacion
 
 def derivada_finita(x, fs = 44100):
 
