@@ -195,15 +195,20 @@ def convImpulseResponse(x,M):
 
 def calculadoraDeM(x,frecuencia,atenuacion):
     
-    xoriginal = x[frecuencia]
-    valorFinal = atenuacion+xoriginal
+    valorEnFrecuencia = x[frecuencia]
+    valorFinal = atenuacion+valorEnFrecuencia
     
     M = 1
-    x = convImpulseResponse(x,M)
+    x1 = convImpulseResponse(x,M)
 
-    while atenuacion<x[frecuencia]-valorFinal and range(3):
+    while range(2,3,100) > valorEnFrecuencia - x1[frecuencia]:
         M += 1
-        xfiltrado = convImpulseResponse(x,M)
-
-    return xfiltrado,M,xoriginal
-
+        x1 = convImpulseResponse(x,M)
+        
+    
+    print(f'El valor de la señal en {frecuencia} Hz es: {round(valorEnFrecuencia,3)} dB,',
+              f'con una atenuación de {atenuacion}:',
+              round(valorFinal,3),f'dB. Aplicando el filtro pedido con M = {M},',
+              f'el valor en {frecuencia} Hz resulta:',round(x1[frecuencia],2),'dB.')
+        
+    return x1,M,valorEnFrecuencia
