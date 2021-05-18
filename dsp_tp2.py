@@ -170,7 +170,7 @@ def convolucion_DFT(signal1,signal2):
     
     y = np.fft.ifft(y_DFT)
     
-    return abs(y),h
+    return np.real(y),h
 
 def convImpulseResponse(x,M):
     """
@@ -195,20 +195,16 @@ def convImpulseResponse(x,M):
 
 def calculadoraDeM(x,frecuencia,atenuacion):
     
-    valorEnFrecuencia = x[frecuencia]
-    valorFinal = atenuacion+valorEnFrecuencia
+    valorEnFrecuencia = abs(20*np.log10(x[frecuencia]))
     
     M = 1
-    x1 = convImpulseResponse(x,M)
-
-    while range(2,3,100) > valorEnFrecuencia - x1[frecuencia]:
-        M += 1
-        x1 = convImpulseResponse(x,M)
-        
+    x1 = abs(convImpulseResponse(x,M))
+    x1_db= 20*np.log10(x1)
     
-    print(f'El valor de la señal en {frecuencia} Hz es: {round(valorEnFrecuencia,3)} dB,',
-              f'con una atenuación de {atenuacion}:',
-              round(valorFinal,3),f'dB. Aplicando el filtro pedido con M = {M},',
-              f'el valor en {frecuencia} Hz resulta:',round(x1[frecuencia],2),'dB.')
+
+    while range(atenuacion-1,atenuacion,100) > valorEnFrecuencia - x1[frecuencia]:
+        M += 1
+        x1 = 20*np.log10(abs(convImpulseResponse(x,M)))
+       
         
     return x1,M,valorEnFrecuencia
