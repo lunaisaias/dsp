@@ -198,7 +198,8 @@ def calculadoraDeM(x,frecuencia,atenuacion):
     valorEnFrecuencia = abs(20*np.log10(x[frecuencia]))
     
     M = 1
-    x1 = abs(convImpulseResponse(x,M))
+    x1 = convImpulseResponse(x,M)
+    x1 = abs(x1)
     x1_db= 20*np.log10(x1)
     
 
