@@ -198,7 +198,7 @@ def calculadoraDeM(x,frecuencia,atenuacion):
     xoriginal = x[frecuencia]
     valorFinal = atenuacion+xoriginal
     
-    M = 5
+    M = 1
     x = convImpulseResponse(x,M)
 
     while atenuacion<x[frecuencia]-valorFinal and range(3):
