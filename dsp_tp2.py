@@ -115,6 +115,7 @@ def int_cuadratica(x):
    
     return amplitud_maxima, frecuencia_de_interpolacion
 
+
 def derivada_finita(x, fs = 44100):
 
     df = []
