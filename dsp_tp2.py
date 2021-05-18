@@ -172,3 +172,43 @@ def convolucion_DFT(signal1,signal2):
     
     return abs(y),h
 
+def convImpulseResponse(x,M):
+    """
+    Funcion que realiza la convolucion entre una entrada y una Respuesta al impulso de 
+    ventana M. El modo utilizado para la convolucion es 'valid', para no tener valores
+    anómalos en los extremos de la señal resultante
+
+    Parameters
+    ----------
+    x : TFuncion de entrada
+    M : Tamaño de la ventana
+
+    Returns
+    -------
+    xFiltrada : Funcion convolucionada
+
+    """
+    h = np.ones(M)/M
+    y = np.convolve(x,h)
+    
+    return y
+
+def calculadoraDeM(x,frecuencia,atenuacion):
+    
+    valorEnFrecuencia = x[frecuencia]
+    valorFinal = atenuacion+valorEnFrecuencia
+    
+    M = 5
+    x = convImpulseResponse(x,M)
+
+    while 3<x[frecuencia]-valorFinal and range(3):
+        M += 1
+        x = convImpulseResponse(x,M)
+    
+        print(f'El valor de la señal en {frecuencia} Hz es: {round(valorEnFrecuencia,3)} dB,',
+              f'con una atenuación de {atenuacion}:',
+              round(valorFinal,3),f'dB. Aplicando el filtro pedido con M = {M-1},',
+              f'el valor en {frecuencia} Hz resulta:',round(x[frecuencia],2),'dB.')
+        
+    return x,M,valorEnFrecuencia
+
