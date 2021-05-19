@@ -27,7 +27,7 @@ def blackman(M, a0=0.42, a1=0.5, a2=0.08):
 
     '''
     n = np.arange(M)
-    blackman = a0+a1*np.cos(2*np.pi*n/(M-1))+a2*np.cos(4*np.pi*n/(M-1))
+    blackman = a0-a1*np.cos(2*np.pi*n/(M-1))+a2*np.cos(4*np.pi*n/(M-1))
     
     return blackman
 
