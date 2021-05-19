@@ -5,25 +5,25 @@ from scipy import signal
 
 def blackman(M, a0=0.42, a1=0.5, a2=0.08):
     '''
+    Funcion que crea una ventana de Blackman.
     
 
     Parameters
     ----------
-    x : TYPE
-        DESCRIPTION.
-    M : TYPE
-        DESCRIPTION.
-    a0 : TYPE, optional
-        DESCRIPTION. The default is 0.42.
-    a1 : TYPE, optional
-        DESCRIPTION. The default is 0.5.
-    a2 : TYPE, optional
-        DESCRIPTION. The default is 0.08.
+    M : int
+        Ancho de la ventana
+    a0 : float
+         Coeficiente blackman. Default = 0.42.
+    a1 : float
+         Coeficiente blackman. Default = 0.5.
+    a2 : float
+         Coeficiente blackman. Default = 0.08.
 
     Returns
     -------
-    y : TYPE
-        DESCRIPTION.
+    blackman : ndarray
+               Devuelve la ventana de blackman de M muestras.
+            
 
     '''
     n = np.arange(M)
@@ -33,48 +33,23 @@ def blackman(M, a0=0.42, a1=0.5, a2=0.08):
 
 
 
-def fft(x,t,Nfft):
+
+
+def hann(M):
     '''
-    Approximate the Fourier transform of a finite duration signal 
-    using scipy.signal.freqz()
+    Funcion que crea una ventana de Hann.
     
     Parameters
     ----------
-    x : input signal array
-    t : time array used to create x(t)
-    Nfft : the number of frdquency domain points used to 
-           approximate X(f) on the interval [fs/2,fs/2], where
-           fs = 1/Dt. Dt being the time spacing in array t
-    
+    M : int
+        Ancho de la ventana
+
     Returns
     -------
-    f : frequency axis array in Hz
-    X : the Fourier transform approximation (complex)
-    
-    Notes
-    -----
-    The output time axis starts at the sum of the starting values in x1 and x2 
-    and ends at the sum of the two ending values in x1 and x2. The default 
-    extents of ('f','f') are used for signals that are active (have support) 
-    on or within n1 and n2 respectively. A right-sided signal such as 
-    :math:`a^n*u[n]` is semi-infinite, so it has extent 'r' and the
-    convolution output will be truncated to display only the valid results.
-
+    hann : ndarray
+           Devuelve una ventana de Hann de M muestras.
     
     '''
-    fs = 1/(t[1] - t[0])
-    t0 = (t[-1]+t[0])/2 # time delay at center
-    N0 = len(t)/2 # FFT center in samples
-    f = np.arange(-1./2,1./2,1./Nfft)
-    w, X = signal.freqz(x,1,2*np.pi*f)
-    X /= fs # account for dt = 1/fs in integral
-    X *= np.exp(-1j*2*np.pi*f*fs*t0)# time interval correction
-    X *= np.exp(1j*2*np.pi*f*N0)# FFT time interval is [0,Nfft-1]
-    F = f*fs
-    
-    return F, X
-
-def hann(M):
 
     n = np.arange(M)
     hann = 0.5 - 0.5*np.cos((2*np.pi*n)/(M-1))
@@ -83,16 +58,21 @@ def hann(M):
 
 def int_cuadratica(x):
     """
-    Funcion que realiza interpolación cuadrática para encontrar una
-    mejor aproximación del índice de un máximo
+    Funcion que realiza interpolacion cuadratica para encontrar una
+    mejor aproximacion del índice de un maximo.
 
     Parameters
     ----------
-    x : Señal de entrada
+    x : ndarray
+        Senial de entrada
 
     Returns
     -------
-    Devuelve valor de índice maximo interpolado
+        amplitud_maxima : float
+            Amplitud maxima de la señal segun metodo de interpolacion
+        
+        frecuencia de interpolacion : float
+            Frecuencia en la que se encuentra la amplitud_maxima
 
     """
     indice_maximo = max(x)
@@ -117,7 +97,20 @@ def int_cuadratica(x):
 
 
 def derivada_finita(x, fs = 44100):
+    """
+    Funcion que realiza la derivada finita de una funcion.
 
+    Parameters
+    ----------
+    x : ndarray
+        Senial de entrada
+
+    Returns
+    -------
+       df : ndarray
+           Derivada por metodo finito forward
+
+    """
     df = []
 
     for i in range (0, len(x)-1):
@@ -132,42 +125,50 @@ def derivada_finita(x, fs = 44100):
 def convolucion_DFT(signal1,signal2):
     
     '''
-    Scipy implementation of a moving average filter with a convolutional method.
-    The resulting filtered sample is calculated with a convolution between the
-    original signal and a rectangular pulse with length 'M'.
+    
 
     Parameters
     ----------
     signal1 : ndarray
-        Input signal.
+        Senial a convolucionar.
     
     signal2 : ndarray
-        Input signal.
+        Respuesta al impulso a convolucionar.
         
 
     Returns
     -------
     y : ndarray
-        Output convolution.
-
+        Parte real de la convolucion lineal de signal1*signal2.
+        
+    h : ndarray
+        Respuesta al impulso con zero padding.
+        
     '''
+    
+    #Copia las señales
     x = np.copy(signal1)
     h = np.copy(signal2)
     
+    #calculo del largo de la convolucion lineal
     N = len(x) + len(h) - 1        
     
+    #genera un vector de zeros a agregar a la senial 1 
     zeros_1 = np.zeros(N - len(x))
     x = np.hstack((x, zeros_1))
     
-    
+    #genera un vector de zeros a agregar a la senial 2 
     zeros_2 = np.zeros(N - len(h))
     h = np.hstack((h, zeros_2))
-
+    
+    #Calculos de DFT
     x_DFT = np.fft.fft(x)
     h_DFT = np.fft.fft(h)
     
+    #Producto de las dft
     y_DFT = x_DFT * h_DFT
     
+    #Transformada inversa del producto(propiedad de DFT)
     y = np.fft.ifft(y_DFT)
     
     return np.real(y),h
@@ -176,24 +177,56 @@ def convImpulseResponse(x,M):
     """
     Funcion que realiza la convolucion entre una entrada y una Respuesta al impulso de 
     ventana M. El modo utilizado para la convolucion es 'valid', para no tener valores
-    anómalos en los extremos de la señal resultante
+    anómalos en los extremos de la señal resultante.
 
     Parameters
     ----------
-    x : TFuncion de entrada
-    M : Tamaño de la ventana
+    x : ndarray
+        TFuncion de entrada
+        
+    M : int
+        Tamaño de la ventana
 
     Returns
     -------
-    xFiltrada : Funcion convolucionada
+    y: ndarray
+        Funcion convolucionada
 
     """
-    h = np.ones(M)/M
+    h = np.ones(int(M))/int(M)
     y = np.convolve(x,h)
     
     return y
 
 def calculadoraDeM(x,frecuencia,atenuacion):
+    
+    """
+    Funcion que calcula el valor de una ventana, en funcion de la atenuacion requerida
+    en cierto componete del espectro de la senial.
+
+    Parameters
+    ----------
+    x : ndarray
+        Funcion de entrada
+        
+    M : int
+        Tamanio de la ventana
+        
+    atenuacion: int
+        Atenuacion requerida en dB
+
+    Returns
+    -------
+    M : int 
+        Tamanio de la ventana calculada
+    
+    x1 : ndarray
+        Señial de entrada atenuada por la ventana de tamano M(final).
+        
+    valorEnFrecuencia: float
+        Valor en amplitud del punto deseado sin atenuar.
+    
+    """
     
     valorEnFrecuencia = abs(20*np.log10(x[frecuencia]))
     
