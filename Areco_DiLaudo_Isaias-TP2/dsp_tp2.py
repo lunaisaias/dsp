@@ -194,51 +194,7 @@ def convImpulseResponse(x,M):
 
     """
     h = np.ones(int(M))/int(M)
-    y = np.convolve(x,h)
+    y = np.convolve(x,h,'valid')
     
     return y
 
-def calculadoraDeM(x,frecuencia,atenuacion):
-    
-    """
-    Funcion que calcula el valor de una ventana, en funcion de la atenuacion requerida
-    en cierto componete del espectro de la senial.
-
-    Parameters
-    ----------
-    x : ndarray
-        Funcion de entrada
-        
-    M : int
-        Tamanio de la ventana
-        
-    atenuacion: int
-        Atenuacion requerida en dB
-
-    Returns
-    -------
-    M : int 
-        Tamanio de la ventana calculada
-    
-    x1 : ndarray
-        Señial de entrada atenuada por la ventana de tamano M(final).
-        
-    valorEnFrecuencia: float
-        Valor en amplitud del punto deseado sin atenuar.
-    
-    """
-    
-    valorEnFrecuencia = abs(20*np.log10(x[frecuencia]))
-    
-    M = 1
-    x1 = convImpulseResponse(x,M)
-    x1 = abs(x1)
-    x1_db= 20*np.log10(x1)
-    
-
-    while range(atenuacion-1,atenuacion,100) > valorEnFrecuencia - x1[frecuencia]:
-        M += 1
-        x1 = 20*np.log10(abs(convImpulseResponse(x,M)))
-       
-        
-    return x1,M,valorEnFrecuencia
